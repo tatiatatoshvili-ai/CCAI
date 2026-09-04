@@ -1,613 +1,746 @@
 <title>Rtveli Birthday Card</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Karla:wght@400;500;600&family=Noto+Serif+Georgian:wght@400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,50;1,9..144,300..900,50&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Noto+Serif+Georgian:wght@500&display=swap">
 <style>
   :root {
-    --ground: #150a10;
-    --ground-2: #24111b;
-    --card: #1f0f18;
-    --card-edge: #3a1b2b;
-    --wine: #7a2140;
-    --wine-deep: #4b1128;
-    --gold: #d9ae5a;
-    --gold-soft: #f0d493;
-    --leaf: #8b9a45;
-    --parchment: #f4e6cf;
-    --muted: #b79e8c;
-    --display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
-    --body: "Karla", "Helvetica Neue", Arial, sans-serif;
+    --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+    --body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
     --georgian: "Noto Serif Georgian", "Sylfaen", Georgia, serif;
-    --ease: cubic-bezier(.22, .61, .36, 1);
+    --ease: cubic-bezier(.2, .7, .2, 1);
+    --spring: cubic-bezier(.34, 1.56, .64, 1);
+
+    /* step 0 palette, overridden per step below */
+    --ink: #3b0f1f;
+    --ink-soft: rgba(59, 15, 31, .72);
+    --accent: #7a1f3d;
+    --accent-ink: #fff4df;
+    --hill-far: #c97a3e;
+    --hill-near: #8e4b2b;
+    --rows: rgba(59, 15, 31, .25);
+    --pill-bg: #3b0f1f;
+    --pill-ink: #ffe9c6;
+    --grape-a: #6a1d3f;
+    --grape-b: #4b1230;
+    --paper: #fff4df;
+    --paper-ink: #3b0f1f;
+    --gold: #ffd166;
+    --sun: #fff2c6;
+  }
+  :root[data-step="1"] {
+    --ink: #2e0b18; --ink-soft: rgba(46, 11, 24, .72); --accent: #6d1a37;
+    --hill-far: #a85a3c; --hill-near: #6e3328; --rows: rgba(46, 11, 24, .28);
+    --pill-bg: #2e0b18; --pill-ink: #ffe3c2;
+  }
+  :root[data-step="2"] {
+    --ink: #fff1dd; --ink-soft: rgba(255, 241, 221, .75); --accent: #ffd166; --accent-ink: #2a0d1c;
+    --hill-far: #5e2e52; --hill-near: #3a1c3d; --rows: rgba(255, 241, 221, .12);
+    --pill-bg: #ffd166; --pill-ink: #2a0d1c;
+  }
+  :root[data-step="3"] {
+    --ink: #fff1dd; --ink-soft: rgba(255, 241, 221, .75); --accent: #ffd166; --accent-ink: #2a0d1c;
+    --hill-far: #34183e; --hill-near: #1f0f2b; --rows: rgba(255, 241, 221, .09);
+    --pill-bg: #ffd166; --pill-ink: #2a0d1c;
+  }
+  :root[data-step="4"] {
+    --ink: #fff1dd; --ink-soft: rgba(255, 241, 221, .75); --accent: #ffd166; --accent-ink: #2a0d1c;
+    --hill-far: #1e1030; --hill-near: #120920; --rows: rgba(255, 241, 221, .08);
+    --pill-bg: #ffd166; --pill-ink: #2a0d1c;
+  }
+  :root[data-step="5"] {
+    --ink: #fff1dd; --ink-soft: rgba(255, 241, 221, .75); --accent: #ffd166; --accent-ink: #2a0d1c;
+    --hill-far: #120a22; --hill-near: #0a0616; --rows: rgba(255, 241, 221, .07);
+    --pill-bg: #ffd166; --pill-ink: #2a0d1c;
   }
 
   * { box-sizing: border-box; }
-
-  html { color-scheme: dark; }
-
+  html { color-scheme: light; }
   body {
     margin: 0;
     min-height: 100vh;
-    background: var(--ground);
-    background-image:
-      radial-gradient(ellipse 70% 50% at 50% 110%, #3b1526 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 50% -10%, #2a1420 0%, transparent 70%);
-    color: var(--parchment);
+    background: #e8833a;
+    color: var(--ink);
     font-family: var(--body);
-    font-size: 16px;
+    font-size: 17px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    transition: color 1.2s var(--ease);
   }
 
-  #glow {
+  /* ---------- Sky, sun, moon, hills ---------- */
+  .sky {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 1.6s var(--ease);
+  }
+  .sky.is-on { opacity: 1; }
+  .sky-0 { background: linear-gradient(180deg, #fbd68f 0%, #f5a95c 55%, #e8833a 100%); }
+  .sky-1 { background: linear-gradient(180deg, #f6b76a 0%, #e37b47 55%, #b9503b 100%); }
+  .sky-2 { background: linear-gradient(180deg, #7f4a8a 0%, #b95a78 55%, #d97a5a 100%); }
+  .sky-3 { background: linear-gradient(180deg, #2a1544 0%, #52285f 60%, #8a3f5a 100%); }
+  .sky-4 { background: linear-gradient(180deg, #120a2c 0%, #2b1a4a 65%, #4a2650 100%); }
+  .sky-5 { background: linear-gradient(180deg, #06040f 0%, #120a2c 60%, #241535 100%); }
+
+  #fx {
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
+    z-index: 2;
     pointer-events: none;
-    z-index: 0;
   }
 
+  .sun {
+    position: fixed;
+    left: 72%;
+    top: 6%;
+    width: clamp(120px, 22vw, 200px);
+    aspect-ratio: 1;
+    margin-left: calc(clamp(120px, 22vw, 200px) / -2);
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 45%, #fff8dc 0%, #ffe08a 45%, rgba(255, 190, 90, .0) 72%);
+    box-shadow: 0 0 120px 40px rgba(255, 214, 120, .35);
+    z-index: 1;
+    transition: top 1.8s var(--ease), opacity 1.6s var(--ease), transform 1.8s var(--ease);
+  }
+  :root[data-step="1"] .sun { top: 30%; left: 78%; }
+  :root[data-step="2"] .sun { top: 64%; left: 50%; transform: scale(1.25); background: radial-gradient(circle at 50% 45%, #fff1c9 0%, #ffb35c 45%, rgba(255, 140, 80, 0) 72%); box-shadow: 0 0 140px 50px rgba(255, 150, 90, .35); }
+  :root[data-step="3"] .sun, :root[data-step="4"] .sun, :root[data-step="5"] .sun { top: 92%; opacity: 0; }
+
+  .moon {
+    position: fixed;
+    right: 12%;
+    top: 12%;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #fff4d6;
+    box-shadow: 0 0 60px 18px rgba(255, 240, 200, .25), inset -14px -8px 0 0 #d9c39a;
+    opacity: 0;
+    transform: translateY(60px);
+    z-index: 1;
+    transition: opacity 1.6s var(--ease), transform 1.8s var(--ease);
+  }
+  :root[data-step="3"] .moon { opacity: .6; transform: translateY(20px); }
+  :root[data-step="4"] .moon, :root[data-step="5"] .moon { opacity: 1; transform: none; }
+
+  .hills {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .hills svg { display: block; width: 100%; height: clamp(140px, 26vh, 260px); }
+  .hills .far { fill: var(--hill-far); transition: fill 1.6s var(--ease); }
+  .hills .near { fill: var(--hill-near); transition: fill 1.6s var(--ease); }
+  .hills .row { stroke: var(--rows); stroke-width: 1.2; fill: none; transition: stroke 1.6s var(--ease); }
+
+  /* ---------- Stage ---------- */
   .stage {
     position: relative;
-    z-index: 1;
+    z-index: 3;
     min-height: 100vh;
-    display: grid;
-    place-items: center;
-    padding: 28px 16px 40px;
-  }
-
-  .card {
-    position: relative;
-    width: min(100%, 520px);
-    height: min(720px, calc(100vh - 68px));
-    min-height: 600px;
-    border: 1px solid var(--card-edge);
-    background:
-      linear-gradient(180deg, #23111b 0%, #190c14 100%);
-    box-shadow:
-      0 0 0 6px rgba(217, 174, 90, .06),
-      0 40px 80px -30px rgba(0, 0, 0, .8),
-      inset 0 1px 0 rgba(240, 212, 147, .08);
-    overflow: hidden;
     display: grid;
     grid-template-rows: 1fr auto;
   }
-
-  .card::before,
-  .card::after {
-    content: "";
-    position: absolute;
-    left: 18px;
-    right: 18px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(217, 174, 90, .5), transparent);
-    pointer-events: none;
-  }
-  .card::before { top: 18px; }
-  .card::after { bottom: 18px; }
-
   .scenes { position: relative; }
-
   .scene {
     position: absolute;
     inset: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 56px 40px 24px;
+    padding: 40px 22px 24px;
     opacity: 0;
-    transform: translateY(26px);
     visibility: hidden;
-    transition:
-      opacity .7s var(--ease),
-      transform .7s var(--ease),
-      visibility 0s linear .7s;
+    transform: translateY(30px) scale(.985);
+    transition: opacity .7s var(--ease), transform .7s var(--ease), visibility 0s linear .7s;
   }
   .scene.is-active {
     opacity: 1;
-    transform: none;
     visibility: visible;
-    transition:
-      opacity .8s var(--ease) .15s,
-      transform .8s var(--ease) .15s,
-      visibility 0s;
+    transform: none;
+    transition: opacity .9s var(--ease) .2s, transform .9s var(--ease) .2s, visibility 0s;
   }
-  .scene.is-leaving {
-    opacity: 0;
-    transform: translateY(-18px);
-  }
+  .scene.is-leaving { opacity: 0; transform: translateY(-24px) scale(.985); }
+  .scene > .inner { width: min(100%, 640px); display: flex; flex-direction: column; align-items: center; }
 
   .eyebrow {
-    font-family: var(--body);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .22em;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .26em;
     text-transform: uppercase;
-    color: var(--gold);
-    margin: 0 0 18px;
+    color: var(--accent);
+    margin: 0 0 14px;
+    transition: color 1.2s var(--ease);
   }
-
-  h1, h2 {
+  .display {
     font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-weight: 700;
+    line-height: .98;
+    letter-spacing: -.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .display em { font-style: italic; font-weight: 500; }
+  .xl { font-size: clamp(48px, 10.5vw, 92px); }
+  .lg { font-size: clamp(38px, 7.5vw, 66px); }
+  .lead {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 40, "SOFT" 50;
     font-weight: 400;
-    line-height: 1.05;
-    margin: 0;
-    text-wrap: balance;
-    color: var(--gold-soft);
-  }
-  h1 { font-size: clamp(44px, 9vw, 64px); }
-  h2 { font-size: clamp(34px, 7vw, 46px); }
-
-  .lyric {
-    font-family: var(--display);
-    font-style: italic;
-    font-weight: 300;
-    font-size: clamp(22px, 4.6vw, 28px);
-    line-height: 1.3;
-    max-width: 22ch;
-    margin: 0;
-    color: var(--parchment);
-    text-wrap: balance;
-  }
-
-  .small {
-    font-size: 14px;
-    color: var(--muted);
-    max-width: 34ch;
+    font-size: clamp(21px, 3.6vw, 27px);
+    line-height: 1.35;
+    max-width: 30ch;
     margin: 18px 0 0;
+    text-wrap: balance;
   }
+  .note { font-size: 15px; color: var(--ink-soft); margin: 16px 0 0; max-width: 40ch; transition: color 1.2s var(--ease); }
 
-  .stagger > * {
-    opacity: 0;
-    transform: translateY(14px);
-    transition: opacity .6s var(--ease), transform .6s var(--ease);
-  }
+  .stagger > * { opacity: 0; transform: translateY(16px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
   .scene.is-active .stagger > * { opacity: 1; transform: none; }
-  .scene.is-active .stagger > :nth-child(1) { transition-delay: .25s; }
-  .scene.is-active .stagger > :nth-child(2) { transition-delay: .55s; }
+  .scene.is-active .stagger > :nth-child(1) { transition-delay: .35s; }
+  .scene.is-active .stagger > :nth-child(2) { transition-delay: .6s; }
   .scene.is-active .stagger > :nth-child(3) { transition-delay: .85s; }
-  .scene.is-active .stagger > :nth-child(4) { transition-delay: 1.15s; }
-  .scene.is-active .stagger > :nth-child(5) { transition-delay: 1.45s; }
-  .scene.is-active .stagger > :nth-child(6) { transition-delay: 1.75s; }
+  .scene.is-active .stagger > :nth-child(4) { transition-delay: 1.1s; }
+  .scene.is-active .stagger > :nth-child(5) { transition-delay: 1.35s; }
 
-  /* Scene 1: envelope */
-  .envelope {
+  /* ---------- Scene 0: gift box ---------- */
+  .gift {
     position: relative;
-    width: 260px;
-    height: 170px;
-    perspective: 900px;
-    margin: 0 0 34px;
+    width: 200px;
+    height: 200px;
+    margin: 64px auto 8px;
     cursor: pointer;
+    outline: none;
   }
-  .env-back {
+  .gift:focus-visible .bow { filter: drop-shadow(0 0 10px #fff); }
+  .gift .box {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, #5c1a33, #3f1224);
-    border: 1px solid rgba(240, 212, 147, .25);
-    z-index: 1;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+    height: 120px;
+    background: linear-gradient(180deg, #8c2549, #5a1533);
+    border-radius: 6px;
+    box-shadow: 0 30px 50px -20px rgba(60, 10, 30, .6);
   }
-  .env-front {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-  }
-  .env-front::before,
-  .env-front::after {
+  .gift .box::before {
     content: "";
     position: absolute;
+    left: 50%;
     top: 0;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(180deg, #4a1429, #35101e);
-  }
-  .env-front::before { left: 0; clip-path: polygon(0 0, 100% 100%, 0 100%); }
-  .env-front::after { right: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
-  .env-front .lip {
-    position: absolute;
-    left: 0;
-    right: 0;
     bottom: 0;
-    height: 60%;
-    background: linear-gradient(180deg, #55172f, #3a1121);
-    clip-path: polygon(0 100%, 50% 0, 100% 100%);
+    width: 28px;
+    margin-left: -14px;
+    background: linear-gradient(90deg, #f3c15e, #ffe39a 50%, #e0a842);
   }
-
-  .env-letter {
+  .gift .lid {
     position: absolute;
-    left: 18px;
-    right: 18px;
-    bottom: 10px;
-    height: 120px;
+    left: 8px;
+    right: 8px;
+    top: 58px;
+    height: 44px;
+    background: linear-gradient(180deg, #a12d58, #7a1f45);
+    border-radius: 6px;
+    transform-origin: 20% 100%;
+    transition: transform 1s var(--spring), opacity .8s var(--ease);
     z-index: 2;
-    background: var(--parchment);
-    color: var(--wine-deep);
-    font-family: var(--display);
-    font-style: italic;
-    font-size: 22px;
-    display: grid;
-    place-items: center;
-    transform: translateY(6px);
-    transition: transform 1s var(--ease) .35s;
   }
-  .env-flap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 96px;
-    background: linear-gradient(180deg, #7a2140, #5a1a32);
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-    transform-origin: top center;
-    transform: rotateX(0deg);
-    transition: transform .9s var(--ease), z-index 0s linear .45s;
-    z-index: 4;
-  }
-  .env-seal {
+  .gift .lid::before {
+    content: "";
     position: absolute;
     left: 50%;
-    top: 78px;
-    width: 48px;
-    height: 48px;
-    margin-left: -24px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #f0d493, #b8862f 60%, #8a6220);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, .45);
-    display: grid;
-    place-items: center;
-    z-index: 5;
-    transition: opacity .4s var(--ease), transform .4s var(--ease);
+    top: 0;
+    bottom: 0;
+    width: 28px;
+    margin-left: -14px;
+    background: linear-gradient(90deg, #f3c15e, #ffe39a 50%, #e0a842);
   }
-  .env-seal svg { width: 26px; height: 26px; }
-  .envelope.is-open .env-flap { transform: rotateX(-175deg); z-index: 1; }
-  .envelope.is-open .env-seal { opacity: 0; transform: scale(.6); }
-  .envelope.is-open .env-letter { transform: translateY(-92px); }
+  .gift .bow {
+    position: absolute;
+    left: 50%;
+    top: 22px;
+    width: 0;
+    height: 0;
+    z-index: 3;
+    transition: transform 1s var(--spring), opacity .6s var(--ease);
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  .gift .bow i {
+    position: absolute;
+    width: 46px;
+    height: 30px;
+    top: 4px;
+    border: 7px solid #f6c65f;
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
+  .gift .bow i:first-child { left: -48px; transform: rotate(-20deg); }
+  .gift .bow i:last-child { left: 2px; transform: rotate(20deg); }
+  .gift .bow b { position: absolute; left: -10px; top: 12px; width: 20px; height: 20px; border-radius: 50%; background: #ffe39a; }
+  .gift.is-open .lid { transform: translate(-30px, -150px) rotate(-28deg); opacity: 0; }
+  .gift.is-open .bow { transform: translateY(-190px) rotate(20deg); opacity: 0; animation: none; }
+  .gift .tap {
+    position: absolute;
+    left: 50%;
+    top: -34px;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+    transition: opacity .3s var(--ease);
+  }
+  .gift.is-open .tap { opacity: 0; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-  /* Scene 2: date */
-  .date {
+  /* ---------- Scene 1: date ---------- */
+  .date-wrap { display: flex; align-items: baseline; gap: 14px; justify-content: center; margin-top: 8px; }
+  .date-num {
     font-family: var(--display);
-    font-size: clamp(64px, 16vw, 112px);
-    font-weight: 300;
-    line-height: .9;
-    color: var(--gold-soft);
-    letter-spacing: -.02em;
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-weight: 800;
+    font-size: clamp(120px, 32vw, 240px);
+    line-height: .85;
+    letter-spacing: -.05em;
     font-variant-numeric: tabular-nums;
   }
   .date-month {
-    font-family: var(--body);
-    font-size: 13px;
-    letter-spacing: .28em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin: 12px 0 0;
-  }
-
-  /* Scene 4: reveal */
-  .vine {
-    width: min(100%, 360px);
-    height: auto;
-    margin: 6px 0 14px;
-    overflow: visible;
-  }
-  .vine .stem {
-    fill: none;
-    stroke: var(--leaf);
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-dasharray: 720;
-    stroke-dashoffset: 720;
-  }
-  .vine .leaf { fill: var(--leaf); opacity: 0; transform-origin: center; transform: scale(.4); }
-  .vine .grape { fill: #5a1a32; stroke: #8f2b4c; stroke-width: 1; opacity: 0; transform-origin: center; transform: scale(.2); }
-  .scene.is-active .vine .stem { animation: draw 1.8s var(--ease) .4s forwards; }
-  .scene.is-active .vine .leaf { animation: pop .6s var(--ease) forwards; }
-  .scene.is-active .vine .grape { animation: pop .5s var(--ease) forwards; }
-  .scene.is-active .vine .leaf:nth-of-type(1) { animation-delay: 1.3s; }
-  .scene.is-active .vine .leaf:nth-of-type(2) { animation-delay: 1.6s; }
-  .scene.is-active .vine .leaf:nth-of-type(3) { animation-delay: 1.9s; }
-  .scene.is-active .vine .grape { animation-delay: calc(1.9s + var(--i) * 70ms); }
-
-  @keyframes draw { to { stroke-dashoffset: 0; } }
-  @keyframes pop { to { opacity: 1; transform: scale(1); } }
-
-  .georgian {
-    font-family: var(--georgian);
-    font-size: 15px;
-    letter-spacing: .12em;
-    color: var(--gold);
-    margin: 0 0 8px;
-  }
-  .place {
     font-family: var(--display);
     font-style: italic;
-    font-size: clamp(20px, 4.4vw, 24px);
-    color: var(--parchment);
-    margin: 14px 0 0;
-  }
-
-  /* Scene 5: programme */
-  .scene--programme { justify-content: flex-start; padding-top: 48px; text-align: left; align-items: stretch; }
-  .programme { width: 100%; margin: 0; }
-  .block { display: grid; grid-template-columns: 62px 1fr; gap: 0 16px; padding: 12px 0; border-top: 1px solid rgba(217, 174, 90, .18); }
-  .block:first-of-type { border-top: 0; padding-top: 0; }
-  .time {
-    font-family: var(--display);
-    font-size: 26px;
-    font-weight: 400;
+    font-weight: 500;
+    font-size: clamp(26px, 6vw, 44px);
     line-height: 1;
-    color: var(--gold-soft);
-    font-variant-numeric: tabular-nums;
-    padding-top: 2px;
+    text-align: left;
   }
-  .block ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
-  .block li { font-size: 14px; line-height: 1.4; color: var(--parchment); }
-  .block li strong { font-weight: 600; color: var(--gold-soft); }
-  .block li .venue { color: var(--muted); }
-  .block li .venue::before { content: " · "; }
+  .date-month small { display: block; font-family: var(--body); font-style: normal; font-weight: 700; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
 
-  /* Scene 6: closing */
-  .link {
-    display: inline-block;
-    margin-top: 26px;
-    padding: 12px 22px;
-    border: 1px solid var(--gold);
-    color: var(--gold-soft);
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    transition: background .3s var(--ease), color .3s var(--ease);
-  }
-  .link:hover, .link:focus-visible { background: var(--gold); color: var(--wine-deep); outline: none; }
-  .signature {
-    font-family: var(--display);
-    font-style: italic;
-    font-size: 24px;
-    color: var(--gold-soft);
-    margin: 22px 0 0;
-  }
+  /* ---------- Scene 2: press the grapes ---------- */
+  .press { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end; width: min(100%, 460px); margin: 22px auto 0; }
+  .grapes { width: 100%; height: auto; cursor: pointer; touch-action: manipulation; overflow: visible; }
+  .grapes .g { fill: url(#gg); stroke: rgba(255, 241, 221, .25); stroke-width: 1; transform-box: fill-box; transform-origin: center; transition: transform .25s var(--spring), opacity .3s var(--ease); }
+  .grapes .g:hover { transform: scale(1.08); }
+  .grapes .g.is-done { transform: scale(0); opacity: 0; }
+  .grapes .leaf { fill: #8fa34a; }
+  .qvevri { width: 100%; height: auto; overflow: visible; }
+  .qvevri .clay { fill: #b5623a; stroke: #7a3d22; stroke-width: 3; }
+  .qvevri .juice { fill: #6a1d3f; transition: height .5s var(--ease), y .5s var(--ease); }
+  .qvevri .shine { fill: rgba(255, 255, 255, .12); }
+  .qvevri .pct { font-family: var(--display); font-weight: 700; font-size: 34px; fill: #fff1dd; text-anchor: middle; }
+  .press-msg { min-height: 2.6em; margin-top: 6px; }
+  .press-msg .found { font-family: var(--display); font-variation-settings: "opsz" 96, "SOFT" 50; font-weight: 700; font-size: clamp(34px, 7vw, 56px); line-height: 1.05; margin: 8px 0 0; opacity: 0; transform: translateY(12px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+  .press-msg.is-found .found { opacity: 1; transform: none; }
+  .press-msg .counter { font-size: 14px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); transition: opacity .3s var(--ease); }
+  .press-msg.is-found .counter { opacity: 0; }
 
-  /* Controls */
-  .controls {
+  /* ---------- Scene 3: ticket ---------- */
+  .ticket {
+    position: relative;
+    width: min(100%, 560px);
+    margin: 20px auto 0;
     display: grid;
-    grid-template-columns: 56px 1fr 56px;
-    align-items: center;
-    padding: 12px 30px 34px;
-    gap: 12px;
+    grid-template-columns: 1fr 96px;
+    background: var(--paper);
+    color: var(--paper-ink);
+    border-radius: 14px;
+    box-shadow: 0 40px 70px -30px rgba(0, 0, 0, .6), 0 0 0 1px rgba(0, 0, 0, .06);
+    transform: rotate(-1.5deg);
+    text-align: left;
+    overflow: hidden;
   }
-  .cluster { display: flex; justify-content: center; }
-  .cluster svg { width: 78px; height: 44px; overflow: visible; }
-  .cluster circle {
-    fill: #3a1424;
-    stroke: rgba(217, 174, 90, .45);
-    stroke-width: 1;
-    transition: fill .5s var(--ease), stroke .5s var(--ease);
+  .ticket::before, .ticket::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 26px;
+    height: 26px;
+    margin-top: -13px;
+    border-radius: 50%;
+    background: var(--hill-near);
+    transition: background 1.6s var(--ease);
+    z-index: 2;
   }
-  .cluster circle.is-filled { fill: var(--gold); stroke: var(--gold-soft); }
-
-  .nav-btn {
-    appearance: none;
-    background: transparent;
-    border: 1px solid rgba(217, 174, 90, .35);
-    color: var(--gold-soft);
-    width: 56px;
-    height: 44px;
+  .ticket::before { left: -13px; }
+  .ticket::after { right: -13px; }
+  .ticket .main { padding: 26px 26px 22px; border-right: 2px dashed rgba(59, 15, 31, .3); }
+  .ticket .stub {
     display: grid;
     place-items: center;
-    cursor: pointer;
-    transition: border-color .3s var(--ease), background .3s var(--ease), opacity .3s var(--ease);
+    padding: 12px;
+    background: repeating-linear-gradient(135deg, rgba(122, 31, 61, .06) 0 6px, transparent 6px 12px);
   }
-  .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-btn:hover, .nav-btn:focus-visible { border-color: var(--gold); background: rgba(217, 174, 90, .1); outline: none; }
-  .nav-btn[disabled] { opacity: .25; cursor: default; }
-  .nav-btn[hidden] { display: none; }
-
-  .hint {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100px;
-    text-align: center;
-    font-size: 11px;
-    letter-spacing: .2em;
+  .ticket .stub span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-weight: 700;
+    letter-spacing: .3em;
     text-transform: uppercase;
-    color: var(--muted);
-    pointer-events: none;
-    transition: opacity .4s var(--ease);
+    font-size: 12px;
+    color: #7a1f3d;
   }
-  .hint.is-hidden { opacity: 0; }
+  .ticket .geo { font-family: var(--georgian); font-size: 14px; letter-spacing: .14em; color: #7a1f3d; margin: 0 0 4px; }
+  .ticket .title {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 96, "SOFT" 50;
+    font-weight: 800;
+    font-size: clamp(30px, 6vw, 46px);
+    line-height: .98;
+    letter-spacing: -.02em;
+    margin: 0;
+    color: #3b0f1f;
+  }
+  .ticket .sub { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(17px, 3.4vw, 21px); margin: 8px 0 16px; color: #5a1533; }
+  .ticket dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; font-size: 14px; }
+  .ticket dt { font-weight: 700; letter-spacing: .18em; text-transform: uppercase; font-size: 11px; color: #7a1f3d; padding-top: 3px; }
+  .ticket dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .ticket .barcode { margin-top: 16px; height: 34px; background: repeating-linear-gradient(90deg, #3b0f1f 0 2px, transparent 2px 4px, #3b0f1f 4px 5px, transparent 5px 9px, #3b0f1f 9px 12px, transparent 12px 14px); opacity: .8; }
 
-  @media (max-width: 420px) {
-    .scene { padding: 48px 26px 20px; }
-    .block { grid-template-columns: 54px 1fr; }
-    .time { font-size: 22px; }
+  /* ---------- Scene 4: programme ---------- */
+  .scene--day .inner { width: min(100%, 980px); }
+  .strip-wrap { position: relative; width: 100%; margin-top: 22px; }
+  .strip {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 6px 22px 18px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .strip::-webkit-scrollbar { display: none; }
+  .moment {
+    flex: 0 0 min(72vw, 250px);
+    scroll-snap-align: center;
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(255, 241, 221, .08);
+    border: 1px solid rgba(255, 241, 221, .14);
+    backdrop-filter: blur(6px);
+    text-align: left;
+    display: grid;
+    grid-template-rows: 96px 1fr;
+  }
+  .moment .tile { position: relative; }
+  .moment .tile::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 30%;
+    background: rgba(20, 8, 24, .45);
+    clip-path: polygon(0 100%, 12% 55%, 24% 75%, 38% 30%, 50% 60%, 63% 20%, 76% 55%, 88% 35%, 100% 70%, 100% 100%);
+  }
+  .moment .tile b {
+    position: absolute;
+    left: 14px;
+    top: 12px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1;
+    color: #fff4df;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, .35);
+    font-variant-numeric: tabular-nums;
+  }
+  .t16a { background: linear-gradient(180deg, #ffd88a, #f09a4a); }
+  .t16b { background: linear-gradient(180deg, #ffcf7a, #e8833a); }
+  .t16c { background: linear-gradient(180deg, #f7b96f, #d86a3c); }
+  .t18 { background: linear-gradient(180deg, #e39a62, #a94d5c); }
+  .t19 { background: linear-gradient(180deg, #a2537d, #5a2c5e); }
+  .t21a { background: linear-gradient(180deg, #3a1d52, #1c0f2e); }
+  .t21b { background: linear-gradient(180deg, #2a1a4e, #150b28); }
+  .t2130 { background: linear-gradient(180deg, #1b0f33, #0a0618); }
+  .moment .body { padding: 14px 16px 16px; }
+  .moment h3 { font-family: var(--display); font-variation-settings: "opsz" 40, "SOFT" 50; font-weight: 700; font-size: 20px; line-height: 1.15; margin: 0 0 6px; color: var(--ink); }
+  .moment p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--ink-soft); }
+  .moment p span { display: block; margin-top: 4px; color: var(--accent); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .swipe { font-size: 12px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-soft); margin: 4px 0 0; }
+
+  /* ---------- Scene 5: closing ---------- */
+  .signoff {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(22px, 4vw, 30px);
+    margin: 26px 0 0;
+    color: var(--accent);
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 28px;
+    padding: 16px 26px;
+    border-radius: 999px;
+    background: var(--pill-bg);
+    color: var(--pill-ink);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: .04em;
+    box-shadow: 0 20px 40px -18px rgba(0, 0, 0, .5);
+    transition: transform .3s var(--spring), background 1.2s var(--ease), color 1.2s var(--ease);
+  }
+  .cta:hover, .cta:focus-visible { transform: translateY(-2px) scale(1.03); outline: none; }
+  .cta svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- Controls ---------- */
+  .controls {
+    position: relative;
+    z-index: 4;
+    display: grid;
+    grid-template-columns: 48px 1fr 48px;
+    align-items: center;
+    gap: 12px;
+    width: min(100%, 640px);
+    margin: 0 auto;
+    padding: 8px 22px 30px;
+  }
+  .icon-btn {
+    appearance: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-soft);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: opacity .3s var(--ease), border-color 1.2s var(--ease), color 1.2s var(--ease), transform .3s var(--spring);
+  }
+  .icon-btn:hover, .icon-btn:focus-visible { transform: scale(1.08); outline: none; }
+  .icon-btn[disabled] { opacity: .2; cursor: default; transform: none; }
+  .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .middle { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .pill {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    padding: 14px 26px;
+    background: var(--pill-bg);
+    color: var(--pill-ink);
+    font: inherit;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 18px 36px -16px rgba(0, 0, 0, .5);
+    transition: transform .3s var(--spring), opacity .3s var(--ease), background 1.2s var(--ease), color 1.2s var(--ease);
+  }
+  .pill:hover, .pill:focus-visible { transform: translateY(-2px) scale(1.04); outline: none; }
+  .pill[disabled] { opacity: .45; cursor: default; transform: none; }
+  .pill[hidden] { display: none; }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); opacity: .25; transition: opacity .5s var(--ease), transform .5s var(--spring), background 1.2s var(--ease); }
+  .dots i.is-on { opacity: 1; }
+  .dots i.is-now { transform: scale(1.5); }
+
+  @media (max-width: 560px) {
+    .press { gap: 12px; }
+    .ticket { grid-template-columns: 1fr 64px; }
+    .ticket .main { padding: 20px 18px 18px; }
+    .controls { padding-bottom: 22px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .scene, .scene.is-active, .stagger > *, .env-flap, .env-letter, .env-seal, .cluster circle, .nav-btn {
-      transition-duration: .01ms !important;
-      transition-delay: 0s !important;
-    }
-    .scene.is-active .vine .stem, .scene.is-active .vine .leaf, .scene.is-active .vine .grape {
-      animation-duration: .01ms !important;
-      animation-delay: 0s !important;
-    }
-    #glow { display: none; }
+    *, *::before, *::after { transition-duration: .01ms !important; transition-delay: 0s !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    #fx { display: none; }
   }
 </style>
 
-<canvas id="glow" aria-hidden="true"></canvas>
+<div class="sky sky-0 is-on"></div>
+<div class="sky sky-1"></div>
+<div class="sky sky-2"></div>
+<div class="sky sky-3"></div>
+<div class="sky sky-4"></div>
+<div class="sky sky-5"></div>
+<div class="sun" aria-hidden="true"></div>
+<div class="moon" aria-hidden="true"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<div class="hills" aria-hidden="true">
+  <svg viewBox="0 0 1440 260" preserveAspectRatio="none">
+    <path class="far" d="M0 150 C 180 90, 320 120, 480 100 S 800 40, 980 90 S 1300 130, 1440 80 L1440 260 L0 260 Z"/>
+    <path class="row" d="M0 175 C 240 150, 480 165, 720 150 S 1200 130, 1440 140"/>
+    <path class="row" d="M0 195 C 240 172, 480 186, 720 172 S 1200 152, 1440 162"/>
+    <path class="row" d="M0 215 C 240 194, 480 206, 720 194 S 1200 176, 1440 184"/>
+    <path class="near" d="M0 210 C 200 170, 360 200, 560 180 S 900 120, 1100 170 S 1350 210, 1440 190 L1440 260 L0 260 Z"/>
+    <path class="row" d="M0 235 C 240 220, 480 230, 720 220 S 1200 205, 1440 212"/>
+    <path class="row" d="M0 250 C 240 240, 480 246, 720 240 S 1200 228, 1440 232"/>
+  </svg>
+</div>
 
 <main class="stage">
-  <article class="card" aria-label="Birthday gift card">
-    <div class="scenes">
+  <div class="scenes">
 
-      <section class="scene is-active" data-step="0" aria-labelledby="s0">
+    <section class="scene is-active" data-step="0">
+      <div class="inner">
         <p class="eyebrow">Happy birthday</p>
-        <h1 id="s0">For <span data-name>my love</span></h1>
-        <p class="small">There is something waiting inside. Tap the seal to open the envelope.</p>
-        <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Open the envelope" style="margin-top:34px">
-          <div class="env-back"></div>
-          <div class="env-letter">for you</div>
-          <div class="env-front"><div class="lip"></div></div>
-          <div class="env-flap"></div>
-          <div class="env-seal" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 3v3" stroke="#5a1a32" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M12 5c2 -2 5 -2 6 0c-2 1 -4 1 -6 0z" fill="#5a1a32"/><g fill="#5a1a32"><circle cx="8" cy="9.5" r="2.4"/><circle cx="12" cy="9.5" r="2.4"/><circle cx="16" cy="9.5" r="2.4"/><circle cx="10" cy="13.5" r="2.4"/><circle cx="14" cy="13.5" r="2.4"/><circle cx="12" cy="17.5" r="2.4"/></g></svg>
-          </div>
+        <h1 class="display xl"><span data-name>My love</span>,<br><em>this one is yours.</em></h1>
+        <div class="gift" id="gift" role="button" tabindex="0" aria-label="Open the gift">
+          <span class="tap">Tap the bow</span>
+          <div class="box"></div>
+          <div class="lid"></div>
+          <div class="bow"><i></i><i></i><b></b></div>
         </div>
-      </section>
-
-      <section class="scene" data-step="1" aria-labelledby="s1">
-        <div class="stagger">
-          <p class="eyebrow">Save the date</p>
-          <p class="date" id="s1">27</p>
-          <p class="date-month">September 2026 · Sunday</p>
-          <p class="lyric" style="margin-top:34px">This year I am giving you a whole day, from the first light of the afternoon to the last song of the night.</p>
-        </div>
-      </section>
-
-      <section class="scene" data-step="2" aria-labelledby="s2">
-        <div class="stagger">
-          <p class="eyebrow">A few clues</p>
-          <p class="lyric" id="s2">A meadow in Kakheti, where the grapes hang heavy on the vine.</p>
-          <p class="lyric">Bare feet in a pressing trough.</p>
-          <p class="lyric">Glasses filled by the people who made the wine.</p>
-          <p class="small">One more tap and the gift shows itself.</p>
-        </div>
-      </section>
-
-      <section class="scene" data-step="3" aria-labelledby="s3">
-        <svg class="vine" viewBox="0 0 360 150" aria-hidden="true">
-          <path class="stem" d="M12 118 C 60 40, 110 40, 150 92 S 240 150, 280 78 S 330 26, 350 60"/>
-          <path class="leaf" d="M96 70 c 14 -22, 40 -14, 34 12 c -6 22, -34 22, -34 -12 z"/>
-          <path class="leaf" d="M232 112 c 16 -18, 42 -8, 32 14 c -10 20, -36 14, -32 -14 z"/>
-          <path class="leaf" d="M310 46 c 12 -18, 36 -12, 30 8 c -6 18, -30 18, -30 -8 z"/>
-          <g>
-            <circle class="grape" style="--i:0" cx="176" cy="104" r="7"/>
-            <circle class="grape" style="--i:1" cx="190" cy="104" r="7"/>
-            <circle class="grape" style="--i:2" cx="204" cy="104" r="7"/>
-            <circle class="grape" style="--i:3" cx="169" cy="116" r="7"/>
-            <circle class="grape" style="--i:4" cx="183" cy="116" r="7"/>
-            <circle class="grape" style="--i:5" cx="197" cy="116" r="7"/>
-            <circle class="grape" style="--i:6" cx="211" cy="116" r="7"/>
-            <circle class="grape" style="--i:7" cx="176" cy="128" r="7"/>
-            <circle class="grape" style="--i:8" cx="190" cy="128" r="7"/>
-            <circle class="grape" style="--i:9" cx="204" cy="128" r="7"/>
-            <circle class="grape" style="--i:10" cx="183" cy="140" r="7"/>
-            <circle class="grape" style="--i:11" cx="197" cy="140" r="7"/>
-            <circle class="grape" style="--i:12" cx="190" cy="151" r="6"/>
-          </g>
-        </svg>
-        <div class="stagger">
-          <p class="georgian">რთველი 2026</p>
-          <h2 id="s3">The Harvest Festival</h2>
-          <p class="place">Château Buera, Lopota</p>
-          <p class="small">A day of music, wine, and traditions on the Château Buera meadow. We harvest, we press, we taste, we listen.</p>
-        </div>
-      </section>
-
-      <section class="scene scene--programme" data-step="4" aria-labelledby="s4">
-        <p class="eyebrow" id="s4">Our day, hour by hour</p>
-        <div class="programme stagger">
-          <div class="block">
-            <div class="time">16:00</div>
-            <ul>
-              <li>Harvesting in the vineyards and traditional grape pressing</li>
-              <li>Wine tastings from Georgian wineries</li>
-              <li>Georgian culinary experiences and masterclasses</li>
-              <li>Family and children’s workshops on the meadow</li>
-            </ul>
-          </div>
-          <div class="block">
-            <div class="time">18:00</div>
-            <ul><li><strong>Georgian National Ballet Sukhishvili</strong></li></ul>
-          </div>
-          <div class="block">
-            <div class="time">19:00</div>
-            <ul><li><strong>Niaz Diasamidze &amp; 33a</strong></li></ul>
-          </div>
-          <div class="block">
-            <div class="time">21:00</div>
-            <ul>
-              <li>Georgian polyphonic music <span class="venue">Kakhetian Corner</span></li>
-              <li>DJ live set <span class="venue">IKE Asian Fusion</span></li>
-              <li>Live piano <span class="venue">Château Buera</span></li>
-            </ul>
-          </div>
-          <div class="block">
-            <div class="time">21:30</div>
-            <ul><li><strong>Nali Band, The Night of Rock &amp; Roll</strong> <span class="venue">Lopota Jazz Club</span></li></ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="scene" data-step="5" aria-labelledby="s5">
-        <div class="stagger">
-          <p class="eyebrow">The 27th is ours</p>
-          <h2 id="s5">Happy birthday, <span data-name>my love</span></h2>
-          <p class="lyric" style="margin-top:22px">Wear something you can stomp grapes in. I will bring the rest.</p>
-          <p class="signature" data-from hidden>With all my love</p>
-          <a class="link" href="https://lopotaresort.com/offers/rtveli2026" target="_blank" rel="noopener">See the festival</a>
-        </div>
-      </section>
-
-    </div>
-
-    <p class="hint" id="hint">Tap the seal</p>
-
-    <nav class="controls" aria-label="Card navigation">
-      <button class="nav-btn" id="prev" type="button" aria-label="Previous" disabled>
-        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
-      </button>
-      <div class="cluster" aria-hidden="true">
-        <svg viewBox="0 0 78 44">
-          <circle cx="12" cy="10" r="6"/>
-          <circle cx="26" cy="10" r="6"/>
-          <circle cx="40" cy="10" r="6"/>
-          <circle cx="54" cy="10" r="6"/>
-          <circle cx="68" cy="10" r="6"/>
-          <circle cx="40" cy="24" r="6"/>
-        </svg>
       </div>
-      <button class="nav-btn" id="next" type="button" aria-label="Next">
-        <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
-      </button>
-    </nav>
-  </article>
+    </section>
+
+    <section class="scene" data-step="1">
+      <div class="inner stagger">
+        <p class="eyebrow">No box this year</p>
+        <div class="date-wrap">
+          <div class="date-num" id="dateNum">1</div>
+          <div class="date-month"><small>Sunday</small>September<br>2026</div>
+        </div>
+        <p class="lead">One whole day, planned around you. From the afternoon sun to the last song of the night.</p>
+      </div>
+    </section>
+
+    <section class="scene" data-step="2">
+      <div class="inner">
+        <p class="eyebrow">Where are we going?</p>
+        <h2 class="display lg">Press the grapes<br><em>and the juice will tell you.</em></h2>
+        <div class="press">
+          <svg class="grapes" id="grapes" viewBox="0 0 200 230" role="img" aria-label="A bunch of grapes. Tap each grape to press it.">
+            <defs>
+              <radialGradient id="gg" cx="35%" cy="30%" r="75%">
+                <stop offset="0" stop-color="#a34a78"/>
+                <stop offset=".6" stop-color="#6a1d3f"/>
+                <stop offset="1" stop-color="#3d0f27"/>
+              </radialGradient>
+            </defs>
+            <path d="M100 8 v22" stroke="#8fa34a" stroke-width="4" stroke-linecap="round"/>
+            <path class="leaf" d="M100 22 c 20 -30, 60 -22, 52 12 c -8 34, -50 34, -52 -12 z"/>
+            <circle class="g" cx="70" cy="62" r="22"/><circle class="g" cx="120" cy="58" r="22"/>
+            <circle class="g" cx="46" cy="102" r="22"/><circle class="g" cx="95" cy="98" r="22"/><circle class="g" cx="144" cy="98" r="22"/>
+            <circle class="g" cx="70" cy="140" r="22"/><circle class="g" cx="120" cy="138" r="22"/>
+            <circle class="g" cx="95" cy="178" r="22"/><circle class="g" cx="140" cy="172" r="20"/>
+            <circle class="g" cx="115" cy="210" r="19"/>
+          </svg>
+          <svg class="qvevri" viewBox="0 0 140 200" role="img" aria-label="A clay qvevri filling with grape juice">
+            <defs>
+              <clipPath id="qc"><path d="M70 12 C 112 12, 134 48, 130 92 C 126 134, 104 168, 70 190 C 36 168, 14 134, 10 92 C 6 48, 28 12, 70 12 Z"/></clipPath>
+            </defs>
+            <path class="clay" d="M70 12 C 112 12, 134 48, 130 92 C 126 134, 104 168, 70 190 C 36 168, 14 134, 10 92 C 6 48, 28 12, 70 12 Z"/>
+            <rect class="juice" id="juice" x="0" y="190" width="140" height="0" clip-path="url(#qc)"/>
+            <ellipse class="shine" cx="46" cy="60" rx="10" ry="26"/>
+            <text class="pct" id="pct" x="70" y="112">0%</text>
+          </svg>
+        </div>
+        <div class="press-msg" id="pressMsg">
+          <div class="counter" id="counter">10 grapes to go</div>
+          <p class="found">Kakheti. Wine country.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-step="3">
+      <div class="inner stagger">
+        <p class="eyebrow">Your gift</p>
+        <h2 class="display lg">A day at the <em>harvest.</em></h2>
+        <div class="ticket">
+          <div class="main">
+            <p class="geo">რთველი 2026</p>
+            <h3 class="title">Harvest Festival</h3>
+            <p class="sub">Château Buera, Lopota</p>
+            <dl>
+              <dt>Date</dt><dd>Sunday, 27 September 2026</dd>
+              <dt>Doors</dt><dd>From 16:00 on the meadow</dd>
+              <dt>Admit</dt><dd>Two. You and me.</dd>
+            </dl>
+            <div class="barcode" aria-hidden="true"></div>
+          </div>
+          <div class="stub"><span>Rtveli 2026</span></div>
+        </div>
+        <p class="note">We pick grapes with our own hands, press them the old way, drink what the winemakers pour, and then Sukhishvili takes the stage.</p>
+      </div>
+    </section>
+
+    <section class="scene scene--day" data-step="4">
+      <div class="inner">
+        <p class="eyebrow">How the day goes</p>
+        <h2 class="display lg">Sun up, <em>sun down,</em> then the music.</h2>
+        <div class="strip-wrap">
+          <div class="strip" id="strip">
+            <article class="moment"><div class="tile t16a"><b>16:00</b></div><div class="body"><h3>Into the vines</h3><p>We harvest in the vineyards, then press the grapes the traditional way.</p></div></article>
+            <article class="moment"><div class="tile t16b"><b>16:00</b></div><div class="body"><h3>Glass after glass</h3><p>Tastings poured by Georgian wineries, right where the grapes grew.</p></div></article>
+            <article class="moment"><div class="tile t16c"><b>16:00</b></div><div class="body"><h3>At the table</h3><p>Georgian cooking experiences and masterclasses on the meadow.</p></div></article>
+            <article class="moment"><div class="tile t18"><b>18:00</b></div><div class="body"><h3>Sukhishvili</h3><p>The Georgian National Ballet, live in the open air.<span>Château Buera meadow</span></p></div></article>
+            <article class="moment"><div class="tile t19"><b>19:00</b></div><div class="body"><h3>Niaz Diasamidze &amp; 33a</h3><p>Live on the meadow as the light goes.<span>Château Buera meadow</span></p></div></article>
+            <article class="moment"><div class="tile t21a"><b>21:00</b></div><div class="body"><h3>Voices in the dark</h3><p>Georgian polyphonic singing under the stars.<span>Kakhetian Corner</span></p></div></article>
+            <article class="moment"><div class="tile t21b"><b>21:00</b></div><div class="body"><h3>Pick your night</h3><p>A DJ live set at IKE Asian Fusion, or live piano at Château Buera.</p></div></article>
+            <article class="moment"><div class="tile t2130"><b>21:30</b></div><div class="body"><h3>Rock &amp; Roll</h3><p>Nali Band closes the night.<span>Lopota Jazz Club</span></p></div></article>
+          </div>
+        </div>
+        <p class="swipe">Swipe through the day</p>
+      </div>
+    </section>
+
+    <section class="scene" data-step="5">
+      <div class="inner stagger">
+        <p class="eyebrow">The 27th is ours</p>
+        <h2 class="display xl">Happy birthday,<br><em data-name>my love</em>.</h2>
+        <p class="lead">Wear shoes you are happy to turn purple. Bring your singing voice. I will bring everything else.</p>
+        <p class="signoff" data-from>With all my love</p>
+        <a class="cta" href="https://lopotaresort.com/offers/rtveli2026" target="_blank" rel="noopener">Open the festival page <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </section>
+
+  </div>
+
+  <nav class="controls" aria-label="Card navigation">
+    <button class="icon-btn" id="prev" type="button" aria-label="Previous" disabled><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="middle">
+      <button class="pill" id="next" type="button">Open the gift</button>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <button class="icon-btn" id="nextIcon" type="button" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  </nav>
 </main>
 
 <script>
 (function () {
-  // Personalise through the address: ?to=Name&from=Name
+  var root = document.documentElement;
   var params = new URLSearchParams(location.search);
   var to = params.get("to");
   var from = params.get("from");
   if (to) {
     document.querySelectorAll("[data-name]").forEach(function (el) { el.textContent = to; });
   }
-  var sig = document.querySelector("[data-from]");
-  if (from) { sig.textContent = "With all my love, " + from; }
-  sig.hidden = false;
+  if (from) { document.querySelector("[data-from]").textContent = "With all my love, " + from; }
 
-  var scenes = Array.prototype.slice.call(document.querySelectorAll(".scene"));
-  var grapes = Array.prototype.slice.call(document.querySelectorAll(".cluster circle"));
+  var scenes = [].slice.call(document.querySelectorAll(".scene"));
+  var skies = [].slice.call(document.querySelectorAll(".sky"));
+  var dots = [].slice.call(document.querySelectorAll(".dots i"));
   var prev = document.getElementById("prev");
   var next = document.getElementById("next");
-  var hint = document.getElementById("hint");
-  var envelope = document.getElementById("envelope");
-  var current = 0;
-  var opened = false;
-  var busy = false;
+  var nextIcon = document.getElementById("nextIcon");
+  var labels = ["Open the gift", "Tell me more", "Press the grapes", "Show me the day", "One last thing", ""];
+  var current = 0, busy = false, giftOpen = false, pressed = 0;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function paint() {
-    grapes.forEach(function (g, i) { g.classList.toggle("is-filled", i <= current); });
+    root.setAttribute("data-step", String(current));
+    skies.forEach(function (s, i) { s.classList.toggle("is-on", i === current); });
+    dots.forEach(function (d, i) { d.classList.toggle("is-on", i <= current); d.classList.toggle("is-now", i === current); });
     prev.disabled = current === 0;
-    next.hidden = current === scenes.length - 1;
-    hint.classList.toggle("is-hidden", current !== 0 || opened);
+    var last = current === scenes.length - 1;
+    next.hidden = last;
+    nextIcon.hidden = last;
+    next.textContent = labels[current];
+    var locked = current === 2 && pressed < 10;
+    next.disabled = locked;
+    nextIcon.disabled = locked;
   }
 
   function go(index) {
@@ -619,78 +752,172 @@
     current = index;
     scenes[current].classList.add("is-active");
     paint();
-    setTimeout(function () {
-      leaving.classList.remove("is-leaving");
-      busy = false;
-    }, 800);
+    if (current === 1) countDate();
+    setTimeout(function () { leaving.classList.remove("is-leaving"); busy = false; }, 900);
   }
 
-  function openEnvelope() {
-    if (opened) { go(1); return; }
-    opened = true;
-    envelope.classList.add("is-open");
-    hint.classList.add("is-hidden");
-    setTimeout(function () { go(1); }, 1300);
+  function advance() {
+    if (current === 0 && !giftOpen) { openGift(); return; }
+    if (current === 2 && pressed < 10) return;
+    go(current + 1);
   }
 
-  envelope.addEventListener("click", openEnvelope);
-  envelope.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openEnvelope(); }
+  /* Scene 0: gift */
+  var gift = document.getElementById("gift");
+  function openGift() {
+    if (giftOpen) return;
+    giftOpen = true;
+    gift.classList.add("is-open");
+    var r = gift.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height * .55, 90);
+    setTimeout(function () { go(1); }, reduce ? 100 : 1400);
+  }
+  gift.addEventListener("click", openGift);
+  gift.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openGift(); } });
+
+  /* Scene 1: date counter */
+  var dateNum = document.getElementById("dateNum");
+  var counted = false;
+  function countDate() {
+    if (counted) return;
+    counted = true;
+    if (reduce) { dateNum.textContent = "27"; return; }
+    var start = null, dur = 1400;
+    function tick(t) {
+      if (!start) start = t;
+      var p = Math.min(1, (t - start) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      dateNum.textContent = String(Math.max(1, Math.round(1 + 26 * eased)));
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    setTimeout(function () { requestAnimationFrame(tick); }, 500);
+  }
+
+  /* Scene 2: press the grapes */
+  var grapes = document.getElementById("grapes");
+  var juice = document.getElementById("juice");
+  var pct = document.getElementById("pct");
+  var counter = document.getElementById("counter");
+  var pressMsg = document.getElementById("pressMsg");
+  var total = grapes.querySelectorAll(".g").length;
+  function pressGrape(el, x, y) {
+    if (!el || el.classList.contains("is-done")) return;
+    el.classList.add("is-done");
+    pressed += 1;
+    var level = pressed / total;
+    var h = Math.round(178 * level);
+    juice.setAttribute("height", h);
+    juice.setAttribute("y", 190 - h);
+    pct.textContent = Math.round(level * 100) + "%";
+    burst(x, y, 14, true);
+    var left = total - pressed;
+    counter.textContent = left === 0 ? "" : left + (left === 1 ? " grape to go" : " grapes to go");
+    if (pressed >= total) {
+      pressMsg.classList.add("is-found");
+      next.textContent = "Show me where";
+      labels[2] = "Show me where";
+      paint();
+    }
+  }
+  grapes.addEventListener("click", function (e) {
+    var el = e.target.closest ? e.target.closest(".g") : null;
+    if (!el) {
+      var rest = grapes.querySelector(".g:not(.is-done)");
+      if (rest) { var b = rest.getBoundingClientRect(); pressGrape(rest, b.left + b.width / 2, b.top + b.height / 2); }
+      return;
+    }
+    pressGrape(el, e.clientX, e.clientY);
   });
-  next.addEventListener("click", function () { current === 0 ? openEnvelope() : go(current + 1); });
+  grapes.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      var rest = grapes.querySelector(".g:not(.is-done)");
+      if (rest) { var b = rest.getBoundingClientRect(); pressGrape(rest, b.left + b.width / 2, b.top + b.height / 2); }
+    }
+  });
+  grapes.setAttribute("tabindex", "0");
+
+  /* Navigation */
+  next.addEventListener("click", advance);
+  nextIcon.addEventListener("click", advance);
   prev.addEventListener("click", function () { go(current - 1); });
   document.addEventListener("keydown", function (e) {
-    if (e.target.closest && e.target.closest("button, a, [role=button]")) return;
-    if (e.key === "ArrowRight") { current === 0 ? openEnvelope() : go(current + 1); }
-    if (e.key === "ArrowLeft") { go(current - 1); }
+    if (e.target.closest && e.target.closest("button, a, [role=button], svg")) return;
+    if (e.key === "ArrowRight") advance();
+    if (e.key === "ArrowLeft") go(current - 1);
   });
-
   paint();
 
-  // Ambient lantern light drifting over the meadow
-  var canvas = document.getElementById("glow");
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!reduce && canvas.getContext) {
-    var ctx = canvas.getContext("2d");
-    var motes = [];
-    var W = 0, H = 0;
-    function size() {
-      W = canvas.width = window.innerWidth;
-      H = canvas.height = window.innerHeight;
+  /* ---------- Canvas: stars, lantern motes, bursts ---------- */
+  var canvas = document.getElementById("fx");
+  if (reduce || !canvas.getContext) return;
+  var ctx = canvas.getContext("2d");
+  var W = 0, H = 0, stars = [], motes = [], parts = [];
+  var starAlpha = [0, 0, .25, .7, 1, 1];
+  var moteAlpha = [0, 0, .3, .8, 1, 1];
+  var curStar = 0, curMote = 0;
+
+  function size() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    stars = [];
+    for (var i = 0; i < 160; i++) {
+      stars.push({ x: Math.random() * W, y: Math.random() * H * .7, r: .4 + Math.random() * 1.4, a: Math.random() * Math.PI * 2, s: .01 + Math.random() * .03 });
     }
-    size();
-    window.addEventListener("resize", size);
-    for (var i = 0; i < 46; i++) {
-      motes.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        r: 1 + Math.random() * 2.2,
-        vx: (Math.random() - .5) * .18,
-        vy: -.08 - Math.random() * .22,
-        a: Math.random() * Math.PI * 2,
-        s: .004 + Math.random() * .01
-      });
+    motes = [];
+    for (var j = 0; j < 40; j++) {
+      motes.push({ x: Math.random() * W, y: H * .4 + Math.random() * H * .6, r: 1 + Math.random() * 2, vx: (Math.random() - .5) * .2, vy: -.05 - Math.random() * .2, a: Math.random() * Math.PI * 2, s: .005 + Math.random() * .012 });
     }
-    function frame() {
-      ctx.clearRect(0, 0, W, H);
-      for (var i = 0; i < motes.length; i++) {
-        var m = motes[i];
-        m.x += m.vx; m.y += m.vy; m.a += m.s;
-        if (m.y < -10) { m.y = H + 10; m.x = Math.random() * W; }
-        if (m.x < -10) m.x = W + 10;
-        if (m.x > W + 10) m.x = -10;
-        var alpha = .18 + .32 * (Math.sin(m.a) + 1) / 2;
-        var g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 6);
-        g.addColorStop(0, "rgba(240,212,147," + alpha + ")");
-        g.addColorStop(1, "rgba(240,212,147,0)");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, m.r * 6, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      requestAnimationFrame(frame);
-    }
-    frame();
   }
+  size();
+  window.addEventListener("resize", size);
+
+  function burst(x, y, n, small) {
+    var cols = ["#ffd166", "#ffe9a8", "#a34a78", "#6a1d3f", "#fff4df", "#8fa34a"];
+    for (var i = 0; i < n; i++) {
+      var ang = Math.random() * Math.PI * 2;
+      var sp = (small ? 1.5 : 3) + Math.random() * (small ? 3 : 7);
+      parts.push({ x: x, y: y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - (small ? 1 : 4), r: (small ? 2 : 3) + Math.random() * 4, c: cols[(Math.random() * cols.length) | 0], life: 1, decay: .012 + Math.random() * .015, round: Math.random() > .4 });
+    }
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    curStar += (starAlpha[current] - curStar) * .03;
+    curMote += (moteAlpha[current] - curMote) * .03;
+    var i, s, m, p;
+    if (curStar > .01) {
+      for (i = 0; i < stars.length; i++) {
+        s = stars[i]; s.a += s.s;
+        var tw = .5 + .5 * Math.sin(s.a);
+        ctx.fillStyle = "rgba(255,244,214," + (curStar * (.35 + .65 * tw)) + ")";
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    if (curMote > .01) {
+      for (i = 0; i < motes.length; i++) {
+        m = motes[i]; m.x += m.vx; m.y += m.vy; m.a += m.s;
+        if (m.y < H * .3) { m.y = H + 10; m.x = Math.random() * W; }
+        var al = curMote * (.15 + .35 * (Math.sin(m.a) + 1) / 2);
+        var g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 6);
+        g.addColorStop(0, "rgba(255,209,102," + al + ")");
+        g.addColorStop(1, "rgba(255,209,102,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(m.x, m.y, m.r * 6, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    for (i = parts.length - 1; i >= 0; i--) {
+      p = parts[i];
+      p.x += p.vx; p.y += p.vy; p.vy += .12; p.vx *= .99; p.life -= p.decay;
+      if (p.life <= 0) { parts.splice(i, 1); continue; }
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.c;
+      if (p.round) { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill(); }
+      else { ctx.fillRect(p.x - p.r / 2, p.y - p.r / 2, p.r, p.r * 1.6); }
+      ctx.globalAlpha = 1;
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
 })();
 </script>
